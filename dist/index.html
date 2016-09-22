@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body {
+        width: 200px;
+        margin: 0 auto;
+    }
+
+    .up-arrow {
+        border: 10px solid #fff;
+        border-bottom-color: #f00;
+        width: 0;
+        height: 0;
+        margin-bottom: 5px;
+    }
+
+    .down-arrow {
+        border: 10px solid #fff;
+        border-top-color: #f00;
+        width: 0;
+        height: 0;
+    }
+
+    .arrow-div {
+        float: left;
+    }
+
+    .pace-name {
+        float: left;
+        line-height: 45px;
+        padding-left: 1em;
+    }
+
+    .cb {
+        clear: both;
+    }
+</style>
+<body>
+<div v-for="place in places">
+    <div class="arrow-div">
+        <div class="up-arrow" v-on:click="agree($event)" data-paceid="{{place.id}}"></div>
+        <div class="down-arrow" v-on:click="agree($event)" data-paceid="{{place.id}}"></div>
+    </div>
+    <span class="pace-name">{{place.name}}</span>
+    <div class="cb"></div>
+</div>
+</body>
+<script type="text/javascript" src="http://cdn.bootcss.com/vue/1.0.26/vue.min.js"></script>
+<!--<script src="//cdn.bootcss.com/jquery/3.1.0/core.js"></script>-->
+<script>
+    var vm = new Vue({
+        el: 'body',
+        data: {
+            places: [
+                {
+                    name: '渝悦小馆',
+                    id: 0
+                },
+                {
+                    name: '地下食堂',
+                    id: 1
+                }
+            ]
+        },
+        ready:function () {
+          console.log(this.places[0].name)
+        },
+        methods: {
+            agree:function (event) {
+                var target = event.currentTarget
+                console.log(event)
+                console.log(target)
+
+            }
+        }
+    })
+</script>
+<!--<script>-->
+<!--$(document).ready(function () {-->
+<!--$('.up-arrow')-->
+<!--})-->
+<!--</script>-->
+</html>
