@@ -11,14 +11,6 @@ var serve = require('koa-static')
 var session = require('koa-session');
 var koaBody = require('koa-body')();
 var fs = require('fs')
-var mongoose = require('mongoose');
-
-var place = require('./setting.js')
-var Record = require('./model/record.js')
-
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/food');
-mongoose.connection.on('error', console.error.bind(console, '连接数据库失败'));
 
 var api_router = new Router({
     prefix: '/api'
@@ -33,37 +25,47 @@ var time = {
     minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
     date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
 }
-
-app.use(json());
-app.use(cors());
-app.keys = ['some secret hurr'];
-app.use(session(app));
-
+var path = './data/' + time.day + '.json';
 api_router.post('/intention', koaBody, function *(next) {
     var body = this.request.body
-    var intention = Number(body.intention) * Number(body.type)
-    Record.find({id: body.id, date: time.day}, (err, docs) => {
-        if (docs == '') {
-            var data = {
-                date: time.day,
-                place: place[body.id].name,
-                id: body.id,
-                weight: intention
-            }
-            var record = new Record(data)
-            record.save()
-        } else {
-            var newWeight = docs[0].weight + intention
-            Record.update({id: body.id, date: time.day}, {weight: newWeight}, (err, numAffected) => {
-                console.log('update')
+    var data = new Array()
+    fs.readFile(path, (err, fileData) => {
+        console.log('readfile' + fileData)
+    })
+    fs.open(path, 'w', (err, fd) => {
+        fs.stat(path , (err , stats) => {
+            fs.readFile(path, {encoding: 'utf-8'}, (err, fileData) => {
+                //文件内容
+                console.log(fd)
+                console.log('readfile'+fileData)
+                console.log(stats.size)
+                if (stats.size == 0) {
+                    data.push(body)
+                    console.log('none')
+                } else {
+                    data = JSON.parse(fileData)
+                    console.log('读取的data值' + data)
+                    data.push(body)
+                }
+                console.log(JSON.stringify(data))
+
+                // var jsonData = fileData
+                // console.log(jsonData)
+                fs.writeFile(fd, JSON.stringify(data), (err) => {
+                });
             })
-        }
+        })
     })
     this.response.body = {
         msg: 'success',
         code: '1'
     }
 })
+
+app.use(json());
+app.use(cors());
+app.keys = ['some secret hurr'];
+app.use(session(app));
 
 app.use(api_router.routes())
 
