@@ -25,26 +25,35 @@ var time = {
     minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
     date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
 }
-
-api_router.post('/intention',koaBody,function *(next) {
-    console.log(this.request.body)
+var path = './data/' + time.day + '.json';
+api_router.post('/intention', koaBody, function *(next) {
     var body = this.request.body
-    var data =
-    // data.push(JSON.stringify(this.request.body))
-    // console.log(data)
-    fs.open('./data/'+time.day+'.json', 'a' , (err , fd) => {
-        fs.readFile('./data/'+time.day+'.json', {encoding: 'utf-8'} ,(err, fileData) => {
-            //文件内容
-            if (fileData == false){
-                data.push(JSON.stringify(this.request.body))
-                console.log('none')
-            }else {
-                data = JSON.parse(fileData)
-                data.push(JSON.stringify(this.request.body))
-            }
-            // var jsonData = JSON.parse(fileData)
-            fs.writeFile(fd,data,(err) => {
-            });
+    var data = new Array()
+    fs.readFile(path, (err, fileData) => {
+        console.log('readfile' + fileData)
+    })
+    fs.open(path, 'w', (err, fd) => {
+        fs.stat(path , (err , stats) => {
+            fs.readFile(path, {encoding: 'utf-8'}, (err, fileData) => {
+                //文件内容
+                console.log(fd)
+                console.log('readfile'+fileData)
+                console.log(stats.size)
+                if (stats.size == 0) {
+                    data.push(body)
+                    console.log('none')
+                } else {
+                    data = JSON.parse(fileData)
+                    console.log('读取的data值' + data)
+                    data.push(body)
+                }
+                console.log(JSON.stringify(data))
+
+                // var jsonData = fileData
+                // console.log(jsonData)
+                fs.writeFile(fd, JSON.stringify(data), (err) => {
+                });
+            })
         })
     })
     this.response.body = {
