@@ -9,5 +9,9 @@ module.exports = [
     {
         name: '地下食堂',
         id: 1
+    },
+    {
+        name: '麻辣烫',
+        id: 2
     }
 ]

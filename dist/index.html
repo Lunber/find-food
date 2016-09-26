@@ -38,22 +38,28 @@
     .cb {
         clear: both;
     }
-    .down-arrow[data-intention='1']{
+
+    .down-arrow[data-intention='1'] {
         border-top-color: #ff0000;
     }
-    .up-arrow[data-intention='1']{
+
+    .up-arrow[data-intention='1'] {
         border-bottom-color: #ff0000;
     }
 </style>
 <body>
 <div v-for="place in places">
     <div class="arrow-div">
-        <div class="up-arrow" v-on:click="agree($event)" data-placeid="{{place.id}}" data-intention="0" data-type="1"></div>
-        <div class="down-arrow" v-on:click="agree($event)" data-placeid="{{place.id}}" data-intention="0" data-type="-1"></div>
+        <div class="up-arrow" v-on:click="agree($event)" data-placeid="{{place.id}}" data-intention="0"
+             data-type="1"></div>
+        <div class="down-arrow" v-on:click="agree($event)" data-placeid="{{place.id}}" data-intention="0"
+             data-type="-1"></div>
     </div>
     <span class="pace-name">{{place.name}}</span>
     <div class="cb"></div>
 </div>
+<button type="button" v-on:click="result">结果</button>
+<p>{{end}}</p>
 </body>
 <script type="text/javascript" src="http://cdn.bootcss.com/vue/1.0.26/vue.min.js"></script>
 <script type="text/javascript" src="http://cdn.bootcss.com/vue-resource/1.0.2/vue-resource.min.js"></script>
@@ -61,48 +67,54 @@
     var vm = new Vue({
         el: 'body',
         data: {
-            places: [
-                {
-                    name: '渝悦小馆',
-                    id: 0
-                },
-                {
-                    name: '地下食堂',
-                    id: 1
-                }
-            ],
-            host:''
+            end:'',
+            places: [],
+            host: ''
         },
-        ready:function () {
-          console.log(this.places[0].name);
+        created: function () {
             this.host = window.location.host
+            var _this = this
+            this.$http.get('http://' + this.host + '/api/information').then(function (msg) {
+                console.log(msg.body[0])
+                for (var i = 0 ; i < msg.body.length ; i++){
+                    _this.places.push(msg.body[i])
+                }
+                console.log()
+            })
         },
         methods: {
-            agree:function (event) {
+            agree: function (event) {
                 var target = event.currentTarget
                 var intention = target.dataset.intention
                 var id = target.dataset.placeid;
                 var type = target.dataset.type;
                 console.log(target.dataset.intention)
                 var data = {}
-                if (intention == '0'){
+                if (intention == '0') {
                     target.dataset.intention = '1'
-                    data={
-                        id:id,
-                        intention:'1',
-                        type:type
+                    data = {
+                        id: id,
+                        intention: '1',
+                        type: type
                     }
-                }else {
+                } else {
                     target.dataset.intention = '0'
-                    data={
-                        id:id,
-                        intention:'-1',
-                        type:type
+                    data = {
+                        id: id,
+                        intention: '-1',
+                        type: type
                     }
                 }
                 console.log(data)
-                this.$http.post('http://'+this.host+'/api/intention',data).then(function (msg) {
+                this.$http.post('http://' + this.host + '/api/intention', data).then(function (msg) {
                     console.log(msg)
+                })
+            },
+            result:function () {
+                var _this = this;
+                this.$http.get('http://' + this.host + '/api/result').then(function (msg) {
+                    console.log(msg.body.result)
+                    _this.end = msg.body.result
                 })
             }
         }

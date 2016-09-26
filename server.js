@@ -39,31 +39,60 @@ app.use(cors());
 app.keys = ['some secret hurr'];
 app.use(session(app));
 
-api_router.post('/intention', koaBody, function *(next) {
-    var body = this.request.body
-    var intention = Number(body.intention) * Number(body.type)
-    Record.find({id: body.id, date: time.day}, (err, docs) => {
-        if (docs == '') {
-            var data = {
-                date: time.day,
-                place: place[body.id].name,
-                id: body.id,
-                weight: intention
+api_router
+    .post('/intention', koaBody, function *(next) {
+        var body = this.request.body
+        var intention = Number(body.intention) * Number(body.type)
+        Record.find({id: body.id, date: time.day}, (err, docs) => {
+            if (docs == '') {
+                var data = {
+                    date: time.day,
+                    place: place[body.id].name,
+                    id: body.id,
+                    weight: intention
+                }
+                var record = new Record(data)
+                record.save()
+            } else {
+                var newWeight = docs[0].weight + intention
+                Record.update({id: body.id, date: time.day}, {weight: newWeight}, (err, numAffected) => {
+                    console.log('update')
+                })
             }
-            var record = new Record(data)
-            record.save()
-        } else {
-            var newWeight = docs[0].weight + intention
-            Record.update({id: body.id, date: time.day}, {weight: newWeight}, (err, numAffected) => {
-                console.log('update')
-            })
+        })
+        this.response.body = {
+            msg: 'success',
+            code: '1'
         }
     })
-    this.response.body = {
-        msg: 'success',
-        code: '1'
-    }
-})
+    .get('/information', function *(next) {
+        this.response.body = place;
+    })
+    .get('/result', function *(next) {
+        var result_arr = new Array()
+        var max_weight;
+        yield Record.find({date: time.day}, (err, docs) => {
+            if (docs.length > 0 ) {
+                console.log(docs)
+                max_weight = docs[0].weight
+                for (let i = 0; i < docs.length; i++) {
+                    docs[i].id > max_weight ? max_weight = docs[i].weight : max_weight = max_weight;
+                }
+                console.log(max_weight)
+                for (let i = 0; i < docs.length; i++) {
+                    if(docs[i].weight == max_weight)  {
+                        result_arr.push(docs[i])
+                    }
+                }
+                console.log(result_arr)
+                let n = Math.floor(Math.random() * result_arr.length + 1)-1;
+                return this.response.body = {
+                    result:result_arr[n].place
+                }
+            }
+        })
+
+    })
 
 app.use(api_router.routes())
 
