@@ -17,7 +17,8 @@ var place = require('./setting.js')
 var Record = require('./model/record.js')
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://lunber:19920928@ds041556.mlab.com:41556/find-food');
+// mongoose.connect('mongodb://lunber:19920928@ds041556.mlab.com:41556/find-food');
+mongoose.connect('mongodb://localhost:27017/food');
 mongoose.connection.on('error', console.error.bind(console, '连接数据库失败'));
 
 var api_router = new Router({
@@ -95,5 +96,5 @@ app.use(api_router.routes())
 
 app.use(serve('dist'))
 
-app.listen(3001);
+app.listen(3001,'0.0.0.0');
 console.log("listen port 3001")
