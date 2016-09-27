@@ -17,7 +17,7 @@ var place = require('./setting.js')
 var Record = require('./model/record.js')
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/food');
+mongoose.connect('mongodb://lunber:19920928@ds041556.mlab.com:41556/find-food');
 mongoose.connection.on('error', console.error.bind(console, '连接数据库失败'));
 
 var api_router = new Router({
@@ -73,18 +73,15 @@ api_router
         var max_weight;
         yield Record.find({date: time.day}, (err, docs) => {
             if (docs.length > 0 ) {
-                console.log(docs)
                 max_weight = docs[0].weight
                 for (let i = 0; i < docs.length; i++) {
                     docs[i].id > max_weight ? max_weight = docs[i].weight : max_weight = max_weight;
                 }
-                console.log(max_weight)
                 for (let i = 0; i < docs.length; i++) {
                     if(docs[i].weight == max_weight)  {
                         result_arr.push(docs[i])
                     }
                 }
-                console.log(result_arr)
                 let n = Math.floor(Math.random() * result_arr.length + 1)-1;
                 return this.response.body = {
                     result:result_arr[n].place

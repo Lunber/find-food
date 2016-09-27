@@ -4,6 +4,6 @@ npm-debug.log
 selenium-debug.log
 test/unit/coverage
 test/e2e/reports
-idea/
+.idea/
 aaa
 server-backup.js

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>中午吃啥</title>
 </head>
 <style>
     body {
@@ -75,11 +75,9 @@
             this.host = window.location.host
             var _this = this
             this.$http.get('http://' + this.host + '/api/information').then(function (msg) {
-                console.log(msg.body[0])
                 for (var i = 0 ; i < msg.body.length ; i++){
                     _this.places.push(msg.body[i])
                 }
-                console.log()
             })
         },
         methods: {
@@ -88,7 +86,6 @@
                 var intention = target.dataset.intention
                 var id = target.dataset.placeid;
                 var type = target.dataset.type;
-                console.log(target.dataset.intention)
                 var data = {}
                 if (intention == '0') {
                     target.dataset.intention = '1'
@@ -105,15 +102,11 @@
                         type: type
                     }
                 }
-                console.log(data)
-                this.$http.post('http://' + this.host + '/api/intention', data).then(function (msg) {
-                    console.log(msg)
-                })
+                this.$http.post('http://' + this.host + '/api/intention', data).then(function (msg) {})
             },
             result:function () {
                 var _this = this;
                 this.$http.get('http://' + this.host + '/api/result').then(function (msg) {
-                    console.log(msg.body.result)
                     _this.end = msg.body.result
                 })
             }
